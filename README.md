@@ -1,432 +1,282 @@
-Multimodal Harmful Content Detection
+# Multimodal Harmful Content Detection
 
+A multimodal deep learning system that classifies memes as **offensive** or **non-offensive** by jointly reasoning over image and text content.
 
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-Educational%2FResearch-lightgrey.svg)](#license)
 
-A multimodal deep learning system that classifies memes as offensive or non-offensive by jointly reasoning over image and text content.
+---
 
+## Table of Contents
 
+- [Overview](#overview)
+- [Features](#features)
+- [Project Architecture](#project-architecture)
+- [Dataset](#dataset)
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Testing the Dataset](#testing-the-dataset)
+  - [Testing the Model](#testing-the-model)
+  - [Training](#training)
+  - [Inference](#inference)
+  - [Streamlit Application](#streamlit-application)
+- [Model](#model)
+- [Results](#results)
+- [Limitations](#limitations)
+- [Future Improvements](#future-improvements)
+- [Application](#application)
+- [License](#license)
 
-Python PyTorch Streamlit License
+---
 
+## Overview
 
+Memes often carry harmful or offensive meaning through the *combination* of an image and its overlaid text — neither modality alone always tells the full story. This project tackles that problem with a multimodal deep learning pipeline that fuses:
 
-Table of Contents
-
-Overview
-
-Features
-
-Project Architecture
-
-Dataset
-
-Technologies Used
-
-Project Structure
-
-Installation
-
-Usage
-
-Testing the Dataset
-
-Testing the Model
-
-Training
-
-Inference
-
-Streamlit Application
-
-Model
-
-Results
-
-Limitations
-
-Future Improvements
-
-Application
-
-License
-
-Overview
-
-
-
-Memes often carry harmful or offensive meaning through the combination of an image and its overlaid text — neither modality alone always tells the full story. This project tackles that problem with a multimodal deep learning pipeline that fuses:
-
-
-
-Visual features extracted with a ResNet18 backbone
-
-Textual features extracted with DistilBERT
-
-
+- **Visual features** extracted with a **ResNet18** backbone
+- **Textual features** extracted with **DistilBERT**
 
 to produce a binary classification:
 
+| Label | Meaning |
+|---|---|
+| `Offensive` | The meme contains harmful/offensive content |
+| `Non-offensive` | The meme does not contain harmful/offensive content |
 
+## Features
 
-Label	Meaning
+- Image-based feature extraction using ResNet18
+- Text-based feature extraction using DistilBERT
+- Multimodal feature fusion (concatenation + fully connected classifier)
+- Full training and validation pipeline with checkpointing
+- Held-out test-set evaluation
+- Command-line inference on a single image + text pair
+- Interactive Streamlit web application
+- Git LFS support for the trained model weights
 
-Offensive	The meme contains harmful/offensive content
+## Project Architecture
 
-Non-offensive	The meme does not contain harmful/offensive content
-
-Features
-
-Image-based feature extraction using ResNet18
-
-Text-based feature extraction using DistilBERT
-
-Multimodal feature fusion (concatenation + fully connected classifier)
-
-Full training and validation pipeline with checkpointing
-
-Held-out test-set evaluation
-
-Command-line inference on a single image + text pair
-
-Interactive Streamlit web application
-
-Git LFS support for the trained model weights
-
-Project Architecture
-
-text
-
-&#x20;  Meme Image                          Meme Text
-
-&#x20;      |                                   |
-
-&#x20;      v                                   v
-
-&#x20;  ResNet18                           DistilBERT
-
-&#x20;      |                                   |
-
-&#x20;      v                                   v
-
-&#x20;Image Features                     Text Features
-
-&#x20;      \\                                   /
-
-&#x20;       \\                                 /
-
-&#x20;        \\-------- Feature Fusion -------/
-
-&#x20;                       |
-
-&#x20;                       v
-
-&#x20;                  Classifier
-
-&#x20;                       |
-
-&#x20;                       v
-
-&#x20;       Prediction: Offensive / Non-offensive
-
-
+```text
+   Meme Image                          Meme Text
+       |                                   |
+       v                                   v
+   ResNet18                           DistilBERT
+       |                                   |
+       v                                   v
+ Image Features                     Text Features
+       \                                   /
+        \                                 /
+         \-------- Feature Fusion -------/
+                        |
+                        v
+                   Classifier
+                        |
+                        v
+        Prediction: Offensive / Non-offensive
+```
 
 The image and text representations are concatenated and passed through a fully connected classifier to produce the final prediction.
 
+## Dataset
 
+This project uses the **MultiOFF** dataset, which pairs meme images with associated text and offensive/non-offensive labels.
 
-Dataset
-
-
-
-This project uses the MultiOFF dataset, which pairs meme images with associated text and offensive/non-offensive labels.
-
-
-
-text
-
-MultiOFF\_Dataset/
-
+```text
+MultiOFF_Dataset/
 ├── Labelled Images/
-
 └── Split Dataset/
+    ├── Testing_meme_dataset.csv
+    └── Validation_meme_dataset.csv
+```
 
-&#x20;   ├── Testing\_meme\_dataset.csv
+- The **validation CSV** is further split into training and validation subsets using an **80/20 stratified split**.
+- The **testing CSV** is reserved exclusively for final model evaluation.
 
-&#x20;   └── Validation\_meme\_dataset.csv
+## Technologies Used
 
-The validation CSV is further split into training and validation subsets using an 80/20 stratified split.
+| Category | Tools |
+|---|---|
+| Language | Python |
+| Deep Learning | PyTorch, Torchvision |
+| NLP | Hugging Face Transformers, DistilBERT |
+| Vision | ResNet18 |
+| Data Handling | Pandas, NumPy, Scikit-learn, Pillow |
+| App / UI | Streamlit |
 
-The testing CSV is reserved exclusively for final model evaluation.
+## Project Structure
 
-Technologies Used
-
-Category	Tools
-
-Language	Python
-
-Deep Learning	PyTorch, Torchvision
-
-NLP	Hugging Face Transformers, DistilBERT
-
-Vision	ResNet18
-
-Data Handling	Pandas, NumPy, Scikit-learn, Pillow
-
-App / UI	Streamlit
-
-Project Structure
-
-text
-
+```text
 multimodal-harmful-content-detection/
-
 │
-
-├── MultiOFF\_Dataset/
-
+├── MultiOFF_Dataset/
 │   ├── Labelled Images/
-
 │   └── Split Dataset/
-
-│       ├── Testing\_meme\_dataset.csv
-
-│       └── Validation\_meme\_dataset.csv
-
+│       ├── Testing_meme_dataset.csv
+│       └── Validation_meme_dataset.csv
 │
-
 ├── src/
-
 │   ├── dataset.py
-
 │   ├── model.py
-
 │   ├── train.py
-
 │   ├── evaluate.py
-
 │   └── inference.py
-
 │
-
 ├── checkpoints/
-
 ├── models/
-
-│   └── model\_epoch\_5.pth
-
+│   └── model_epoch_5.pth
 │
-
 ├── app.py
-
-├── test\_dataset.py
-
-├── test\_model.py
-
+├── test_dataset.py
+├── test_model.py
 ├── requirements.txt
-
 ├── .gitignore
-
 └── README.md
+```
 
-Installation
+## Installation
 
-Clone the repository
+1. **Clone the repository**
 
-bash
+   ```bash
+   git clone https://github.com/Nivedithakatta08/multimodal-harmful-content-detection.git
+   ```
 
-&#x20;  git clone https://github.com/Nivedithakatta08/multimodal-harmful-content-detection.git
+2. **Move into the project directory**
 
-Move into the project directory
+   ```bash
+   cd multimodal-harmful-content-detection
+   ```
 
-bash
+3. **Create a virtual environment**
 
-&#x20;  cd multimodal-harmful-content-detection
+   ```bash
+   python -m venv .venv
+   ```
 
-Create a virtual environment
+4. **Activate the virtual environment**
 
-bash
+   Windows (PowerShell):
 
-&#x20;  python -m venv .venv
+   ```powershell
+   .venv\Scripts\Activate.ps1
+   ```
 
-Activate the virtual environment Windows (PowerShell):
+   macOS/Linux:
 
-powershell
+   ```bash
+   source .venv/bin/activate
+   ```
 
-&#x20;  .venv\\Scripts\\Activate.ps1
+5. **Install the required packages**
 
+   ```bash
+   pip install -r requirements.txt
+   ```
 
+## Usage
 
-macOS/Linux:
+### Testing the Dataset
 
-
-
-bash
-
-&#x20;  source .venv/bin/activate
-
-Install the required packages
-
-bash
-
-&#x20;  pip install -r requirements.txt
-
-Usage
-
-Testing the Dataset
-
-bash
-
-python test\_dataset.py
-
-
+```bash
+python test_dataset.py
+```
 
 Verifies that the dataset loads correctly and that images, tokenized text, and labels are returned in the expected format.
 
+### Testing the Model
 
-
-Testing the Model
-
-bash
-
-python test\_model.py
-
-
+```bash
+python test_model.py
+```
 
 Verifies that the multimodal model accepts image and text inputs and produces classification outputs.
 
+### Training
 
-
-Training
-
-bash
-
+```bash
 python -m src.train
-
-
+```
 
 Training checkpoints are saved to:
 
-
-
-text
-
+```text
 checkpoints/
+```
 
-Inference
-
-
+### Inference
 
 Run inference on a single image and its associated text:
 
-
-
-bash
-
+```bash
 python -m src.inference "path/to/meme.png" "example meme text"
-
-
+```
 
 The model returns one of:
 
-
-
-text
-
+```text
 Prediction: Offensive
+```
 
-text
-
+```text
 Prediction: Non-offensive
+```
 
-Streamlit Application
-
-
+### Streamlit Application
 
 Launch the interactive web app:
 
-
-
-bash
-
+```bash
 streamlit run app.py
-
-
+```
 
 The application allows users to:
 
+- Upload a meme image
+- Enter the meme text
+- Run the multimodal classifier
+- View the predicted category
+- View the model's confidence score
 
-
-Upload a meme image
-
-Enter the meme text
-
-Run the multimodal classifier
-
-View the predicted category
-
-View the model's confidence score
-
-Model
-
-
+## Model
 
 The multimodal model consists of three main components:
 
+1. **Image Encoder** — ResNet18 extracts visual features from the meme image.
+2. **Text Encoder** — DistilBERT converts the meme text into a numerical representation.
+3. **Classifier** — The image and text features are concatenated and passed through fully connected layers to predict the final class.
 
+## Results
 
-Image Encoder — ResNet18 extracts visual features from the meme image.
+- The initial trained model achieved approximately **60% accuracy** on the held-out test set.
+- The project highlighted the importance of monitoring the gap between training and validation performance: training accuracy increased substantially while validation accuracy remained relatively stable, indicating **overfitting**.
 
-Text Encoder — DistilBERT converts the meme text into a numerical representation.
+## Limitations
 
-Classifier — The image and text features are concatenated and passed through fully connected layers to predict the final class.
+- The dataset is relatively small.
+- Meme meaning can depend heavily on cultural and contextual information.
+- Text extracted from memes may contain spelling variations, slang, or ambiguous language.
+- Visual and textual features may not always provide enough context to determine harmful intent.
+- Model performance may vary on memes that differ significantly from the training distribution.
 
-Results
+## Future Improvements
 
-The initial trained model achieved approximately 60% accuracy on the held-out test set.
+- Use a larger and more diverse dataset
+- Apply stronger image augmentation
+- Fine-tune the pretrained encoders more carefully
+- Use OCR to automatically extract text from meme images
+- Experiment with CLIP or other multimodal architectures
+- Handle class imbalance
+- Add explainability features (e.g. Grad-CAM, attention visualization)
+- Improve validation and hyperparameter tuning
 
-The project highlighted the importance of monitoring the gap between training and validation performance: training accuracy increased substantially while validation accuracy remained relatively stable, indicating overfitting.
+## Application
 
-Limitations
+This project demonstrates how multimodal machine learning can be applied to **content moderation**, combining information from multiple modalities instead of relying on image or text classification alone.
 
-The dataset is relatively small.
+## License
 
-Meme meaning can depend heavily on cultural and contextual information.
-
-Text extracted from memes may contain spelling variations, slang, or ambiguous language.
-
-Visual and textual features may not always provide enough context to determine harmful intent.
-
-Model performance may vary on memes that differ significantly from the training distribution.
-
-Future Improvements
-
-Use a larger and more diverse dataset
-
-Apply stronger image augmentation
-
-Fine-tune the pretrained encoders more carefully
-
-Use OCR to automatically extract text from meme images
-
-Experiment with CLIP or other multimodal architectures
-
-Handle class imbalance
-
-Add explainability features (e.g. Grad-CAM, attention visualization)
-
-Improve validation and hyperparameter tuning
-
-Application
-
-
-
-This project demonstrates how multimodal machine learning can be applied to content moderation, combining information from multiple modalities instead of relying on image or text classification alone.
-
-
-
-License
-
-
-
-This project is intended for educational and research purposes.
-
+This project is intended for **educational and research purposes**.
