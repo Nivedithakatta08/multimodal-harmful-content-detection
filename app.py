@@ -11,8 +11,7 @@ DEVICE = torch.device(
     "cuda" if torch.cuda.is_available() else "cpu"
 )
 
-MODEL_PATH = "checkpoints/model_epoch_5.pth"
-
+MODEL_PATH = "models/model_epoch_5.pth"
 
 st.set_page_config(
     page_title="Multimodal Harmful Content Detection",
